@@ -8,7 +8,18 @@
         The function is called whenever there was a change in the code.
         No arguments are passed as the [event] attribute is edited directly.
 
-code-editor-scriptable.aCodeEditor
+code-editor-scriptable.relative.wide.tall.flexcol
+    .relative.tall.wide(ref="codebox")
+    .code-editor-scriptable-aProblemPanel.flexrow.nogrow(if="{problem}")
+        .nogrow
+            svg.feather.warning
+                use(xlink:href="#alert-circle")
+        pre.nm {problem.stack.slice(8)}
+        .nogrow
+            button.inline(onclick="{jumpToProblem}")
+                svg.feather
+                    use(xlink:href="#chevron-up")
+                | {voc.jumpToProblem}
     script.
         this.namespace = 'scriptables';
         this.mixin(window.riotVoc);
@@ -53,6 +64,27 @@ code-editor-scriptable.aCodeEditor
             }
         };
 
+        const coffeescript = require('coffeescript');
+        const checkProblemsDebounced = window.debounce(() => {
+            if (!this.codeEditor || this.language !== 'coffeescript') {
+                return;
+            }
+            const oldProblem = this.problem;
+            try {
+                coffeescript.compile(this.codeEditor.getValue(), {
+                    bare: true,
+                    sourcemaps: false
+                });
+                this.problem = false;
+            } catch (err) {
+                this.problem = err;
+            }
+            if (oldProblem !== this.problem) {
+                this.update();
+                this.codeEditor.layout();
+            }
+        }, 750);
+
         this.on('mount', () => {
             var editorOptions = {
                 language: this.language,
@@ -60,7 +92,7 @@ code-editor-scriptable.aCodeEditor
             };
             setTimeout(() => {
                 this.codeEditor = window.setupCodeEditor(
-                    this.root,
+                    this.refs.codebox,
                     Object.assign({}, editorOptions, {
                         value: '',
                         wrapper: (this.language === 'typescript') ? [' ', ' '] : void 0
@@ -71,8 +103,10 @@ code-editor-scriptable.aCodeEditor
                     if (this.currentEvent) {
                         this.currentEvent.code = this.codeEditor.getPureValue();
                     }
+                    checkProblemsDebounced();
                 });
                 this.codeEditor.focus();
+                checkProblemsDebounced();
                 window.addEventListener('resize', refreshLayout);
             }, 0);
         });
@@ -89,3 +123,11 @@ code-editor-scriptable.aCodeEditor
                 updateEvent();
             }
         });
+
+        this.jumpToProblem = () => {
+            this.codeEditor.setPosition({
+                lineNumber: this.problem.location.last_line + 1,
+                column: this.problem.location.last_column + 1
+            });
+            this.codeEditor.focus();
+        };
