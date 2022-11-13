@@ -274,7 +274,7 @@
     },
     "languageSelector": {
         "chooseLanguageHeader": "Choose your coding language",
-        "chooseLanguageExplanation": "This is the language you will write events with to describe your gameplay logic. Previously, all the projects used JavaScript+TypeScript. Note that currently languages cannot be switched in existing projects, so choose carefully!",
+        "chooseLanguageExplanation": "This is the language you will write events with to describe your gameplay logic. Previously, all the projects used JavaScript+TypeScript. Note that you can only convert CoffeeScript projects to JavaScript, but not the other way around, so choose carefully!",
         "coffeeScriptDescription": "A good language for beginners with a simple syntax. Pick this language if you don't have prior experience with programming with code, or if you love Python.",
         "pickCoffeeScript": "I choose CoffeeScript!",
         "jsAndTs": "JavaScript (and TypeScript)",
