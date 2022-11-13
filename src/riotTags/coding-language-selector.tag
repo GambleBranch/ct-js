@@ -11,6 +11,10 @@ coding-language-selector
                                 use(xlink:href="#coffeescript")
                             span CoffeeScript
                         p {voc.coffeeScriptDescription}
+                        pre
+                            code.
+                                if health <= 0 and not invulnerable
+                                    this.kill = yes
                         button(class="{active: selection === 'coffeescript'}" onclick="{selectLanguage('coffeescript')}")
                             svg.icon
                                 use(xlink:href="#coffeescript")
@@ -21,6 +25,11 @@ coding-language-selector
                                 use(xlink:href="#javascript")
                             span {voc.jsAndTs}
                         p {voc.jsTsDescription}
+                        pre
+                            code.
+                                if (health <= 0 && !invulnerable) \{
+                                    this.kill = true;
+                                }
                         button(class="{active: selection === 'typescript'}" onclick="{selectLanguage('typescript')}")
                             svg.icon
                                 use(xlink:href="#javascript")
