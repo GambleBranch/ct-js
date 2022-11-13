@@ -89,7 +89,14 @@ const getBaseScripts = function (entity: IScriptable, project: IProject): Script
         const {lib, eventKey} = event;
         let {code} = event;
         if (project.language === 'coffeescript') {
-            code = coffeeScript.compile(code, coffeeScriptOptions);
+            try {
+                code = coffeeScript.compile(code, coffeeScriptOptions);
+            } catch (e) {
+                const errorMessage = `An error occured while compiling ${eventKey} (${lib}) event of ${entity.name} ${entity.type}`;
+                window.alertify.error(errorMessage, e.message);
+                console.error(errorMessage);
+                throw e;
+            }
         }
         const eventArgs = event.arguments;
         const eventSpec = getEventByLib(eventKey, lib) as IEventDeclaration;
