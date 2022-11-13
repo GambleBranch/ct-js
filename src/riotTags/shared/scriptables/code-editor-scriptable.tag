@@ -62,6 +62,7 @@ code-editor-scriptable.relative.wide.tall.flexcol
                     this.codeEditor.setValue(this.voc.createEventHint);
                 }
             }
+            checkProblemsDebounced();
         };
 
         const coffeescript = require('coffeescript');
