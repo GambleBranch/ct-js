@@ -28,6 +28,27 @@ code-editor-scriptable.relative.wide.tall.flexcol
         this.language = window.currentProject.language || 'typescript';
         this.allEvents = eventsAPI.events;
 
+        const coffeescript = require('coffeescript');
+        const checkProblemsDebounced = window.debounce(() => {
+            if (!this.codeEditor || this.language !== 'coffeescript') {
+                return;
+            }
+            const oldProblem = this.problem;
+            try {
+                coffeescript.compile(this.codeEditor.getValue(), {
+                    bare: true,
+                    sourcemaps: false
+                });
+                this.problem = false;
+            } catch (err) {
+                this.problem = err;
+            }
+            if (oldProblem !== this.problem) {
+                this.update();
+                this.codeEditor.layout();
+            }
+        }, 750);
+
         const refreshLayout = () => {
             setTimeout(() => {
                 this.codeEditor.layout();
@@ -58,33 +79,13 @@ code-editor-scriptable.relative.wide.tall.flexcol
                 } else if (this.language === 'coffeescript') {
                     this.codeEditor.setValue(`# ${this.voc.createEventHint}`);
                 } else {
+                    // eslint-disable-next-line no-console
                     console.warning(`Unknown language used in a code-editor-scriptable: ${this.language}. This is most likely an error.`);
                     this.codeEditor.setValue(this.voc.createEventHint);
                 }
             }
             checkProblemsDebounced();
         };
-
-        const coffeescript = require('coffeescript');
-        const checkProblemsDebounced = window.debounce(() => {
-            if (!this.codeEditor || this.language !== 'coffeescript') {
-                return;
-            }
-            const oldProblem = this.problem;
-            try {
-                coffeescript.compile(this.codeEditor.getValue(), {
-                    bare: true,
-                    sourcemaps: false
-                });
-                this.problem = false;
-            } catch (err) {
-                this.problem = err;
-            }
-            if (oldProblem !== this.problem) {
-                this.update();
-                this.codeEditor.layout();
-            }
-        }, 750);
 
         this.on('mount', () => {
             var editorOptions = {

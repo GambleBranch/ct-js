@@ -156,5 +156,5 @@ main-menu-project
                 const {convertCoffeeToJs} = require('./data/node_requires/resources/projects/convertLanguage');
                 convertCoffeeToJs();
                 this.update();
-            })
+            });
         };
