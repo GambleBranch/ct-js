@@ -63,7 +63,7 @@ code-editor-scriptable.aCodeEditor
                     this.root,
                     Object.assign({}, editorOptions, {
                         value: '',
-                        wrapper: [' ', ' ']
+                        wrapper: (this.language === 'typescript') ? [' ', ' '] : void 0
                     })
                 );
                 updateEvent();
