@@ -14,6 +14,7 @@ code-editor-scriptable.aCodeEditor
         this.mixin(window.riotVoc);
 
         const eventsAPI = require('./data/node_requires/events');
+        this.language = window.currentProject.language || 'typescript';
         this.allEvents = eventsAPI.events;
 
         const refreshLayout = () => {
@@ -27,26 +28,35 @@ code-editor-scriptable.aCodeEditor
                     readOnly: false
                 });
                 this.codeEditor.setValue(this.currentEvent.code);
-                const eventDeclaration = eventsAPI.getEventByLib(
-                    this.currentEvent.eventKey,
-                    this.currentEvent.lib
-                );
-                const varsDeclaration = eventsAPI.getArgumentsTypeScript(eventDeclaration);
-                const ctEntity = this.opts.entitytype === 'template' ? 'Copy' : 'Room';
-                const codePrefix = `function ctJsEvent(this: ${ctEntity}) {${varsDeclaration}`;
-                this.codeEditor.setWrapperCode(codePrefix, '}');
+                if (this.language === 'typescript') {
+                    const eventDeclaration = eventsAPI.getEventByLib(
+                        this.currentEvent.eventKey,
+                        this.currentEvent.lib
+                    );
+                    const varsDeclaration = eventsAPI.getArgumentsTypeScript(eventDeclaration);
+                    const ctEntity = this.opts.entitytype === 'template' ? 'Copy' : 'Room';
+                    const codePrefix = `function ctJsEvent(this: ${ctEntity}) {${varsDeclaration}`;
+                    this.codeEditor.setWrapperCode(codePrefix, '}');
+                }
             } else {
                 this.codeEditor.updateOptions({
                     readOnly: true
                 });
-                this.codeEditor.setValue(`// ${this.voc.createEventHint}`);
+                if (this.language === 'typescript') {
+                    this.codeEditor.setValue(`// ${this.voc.createEventHint}`);
+                } else if (this.language === 'coffeescript') {
+                    this.codeEditor.setValue(`# ${this.voc.createEventHint}`);
+                } else {
+                    console.warning(`Unknown language used in a code-editor-scriptable: ${this.language}. This is most likely an error.`);
+                    this.codeEditor.setValue(this.voc.createEventHint);
+                }
             }
         };
 
         this.on('mount', () => {
             var editorOptions = {
-                language: 'typescript',
-                lockWrapper: true
+                language: this.language,
+                lockWrapper: this.language === 'typescript'
             };
             setTimeout(() => {
                 this.codeEditor = window.setupCodeEditor(
